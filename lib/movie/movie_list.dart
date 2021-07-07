@@ -13,12 +13,8 @@ class MovieList extends StatefulWidget {
 }
 
 class MovieListState extends State<MovieList> {
-  static const _pageSize = 20;
-
   final List<Movie> _movies = [];
   final ScrollController _scrollController = ScrollController();
-  final PagingController<int, Movie> _pagingController =
-      PagingController(firstPageKey: 1);
 
   late MaterialSearch searchBar;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -56,7 +52,7 @@ class MovieListState extends State<MovieList> {
           onPressed: () {
             showSearch(
                 context: context,
-                delegate: MaterialSearch(_pagingController.itemList));
+                delegate: MaterialSearch(context.read<MovieBloc>().movies));
           },
         ),
       ],
@@ -68,6 +64,14 @@ class MovieListState extends State<MovieList> {
         body: BlocConsumer<MovieBloc, MovieState>(
             listener: (context, movieState) {},
             builder: (context, movieState) {
+              if (movieState is MovieInitialState) {
+                return CircularProgressIndicator(
+                  strokeWidth: 3,
+                );
+              }
+              if (movieState is MovieLoadingState) {
+                return CircularProgressIndicator(strokeWidth: 3);
+              }
               if (movieState is MovieSuccessState) {
                 context.read<MovieBloc>().movies.addAll(movieState.movies);
               }
@@ -82,7 +86,8 @@ class MovieListState extends State<MovieList> {
                 padding: EdgeInsets.only(left: 12.0, right: 12.0),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3),
-                itemBuilder: (context, index) => MovieTile( context.read<MovieBloc>().movies[index]),
+                itemBuilder: (context, index) =>
+                    MovieTile(context.read<MovieBloc>().movies[index]),
                 itemCount: context.watch<MovieBloc>().movies.length,
               );
             }));
@@ -90,13 +95,12 @@ class MovieListState extends State<MovieList> {
 
   @override
   void dispose() {
-    _pagingController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }
 
 class MaterialSearch extends SearchDelegate {
-  final movieBloc = MovieBloc();
   final List<Movie>? list;
 
   MaterialSearch(this.list);
@@ -128,10 +132,12 @@ class MaterialSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) => Container(
-        child: GridView.count(
-          crossAxisCount: 3,
+        child: GridView.builder(
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
           padding: EdgeInsets.only(left: 15, right: 15),
-          children: searchResults(),
+          itemBuilder: (context, index) => searchResults()[index],
+          itemCount: searchResults().length,
         ),
         color: Theme.of(context).backgroundColor,
       );
@@ -140,31 +146,27 @@ class MaterialSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     final List<MovieTile> tempList = <MovieTile>[];
     return Container(
-      child: _buildSuggestions(),
+      child: _buildSuggestions(context),
       color: Theme.of(context).backgroundColor,
     );
   }
 
-  Widget _buildSuggestions() {
-    return Container(
-        alignment: Alignment.center,
-        child: Center(
-            child: SizedBox(
-          width: 45,
-          height: 45,
-          child: CircularProgressIndicator(
-            strokeWidth: 3.0,
-          ),
-        )));
+  Widget _buildSuggestions(BuildContext context) {
+    return GridView.builder(
+      gridDelegate:
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+      padding: EdgeInsets.only(left: 15, right: 15),
+      itemBuilder: (context, index) => searchResults()[index],
+      itemCount: searchResults().length,
+    );
   }
 
   List<Widget> searchResults() {
     final temp = <Widget>[];
-    print("initial list is :$list");
-    list?.map((e) {
-      if (e.name.contains(query)) {
-        print(e.name);
-        temp.add(MovieTile(e));
+    list?.forEach((movie) {
+      print(movie.name);
+      if (movie.name.toLowerCase().contains(query.toLowerCase())) {
+        temp.add(MovieTile(movie));
       }
     });
     print("query is :$query" + temp.toString());

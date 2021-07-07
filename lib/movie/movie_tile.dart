@@ -10,14 +10,14 @@ class MovieTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(padding: EdgeInsets.only(top:0,left: 12,right: 12),
+    return Container(padding: EdgeInsets.only(top:12,left: 12,right: 12),
       color: Theme.of(context).backgroundColor,
       child: Column(children: [
-        Container(
+        Expanded(
             child: FadeInImage(
                 placeholder: AssetImage(
                     "assets/images/placeholder_for_missing_posters.png"),
-                image: AssetImage("assets/images/" + movie.poster))),
+                image: AssetImage("assets/images/" + movie.poster),fit: BoxFit.cover,)),
         Container(
           padding: EdgeInsets.only(top: 12),
           child: Text(
