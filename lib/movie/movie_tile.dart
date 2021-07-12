@@ -10,7 +10,7 @@ class MovieTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(padding: EdgeInsets.only(top:12,left: 12,right: 12),
+    return Container(padding: EdgeInsets.only(top:12,left: 8,right: 12),
       color: Theme.of(context).backgroundColor,
       child: Column(children: [
         Expanded(

@@ -13,7 +13,6 @@ class MovieList extends StatefulWidget {
 }
 
 class MovieListState extends State<MovieList> {
-  final List<Movie> _movies = [];
   final ScrollController _scrollController = ScrollController();
 
   late MaterialSearch searchBar;
@@ -22,7 +21,6 @@ class MovieListState extends State<MovieList> {
   @override
   void initState() {
     _fetchPage();
-    print("Hurrrrrrray......");
     super.initState();
   }
 
@@ -85,7 +83,7 @@ class MovieListState extends State<MovieList> {
                   }),
                 padding: EdgeInsets.only(left: 12.0, right: 12.0),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
+                    crossAxisCount: 3,childAspectRatio: 0.7),
                 itemBuilder: (context, index) =>
                     MovieTile(context.read<MovieBloc>().movies[index]),
                 itemCount: context.watch<MovieBloc>().movies.length,
@@ -107,7 +105,7 @@ class MaterialSearch extends SearchDelegate {
 
   @override
   ThemeData appBarTheme(BuildContext context) {
-    return Theme.of(context);
+    return Theme.of(context).copyWith(textTheme: TextTheme(headline1: TextStyle(color: Colors.white,fontSize: 72.0)));
   }
 
   @override
@@ -134,8 +132,8 @@ class MaterialSearch extends SearchDelegate {
   Widget buildResults(BuildContext context) => Container(
         child: GridView.builder(
           gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-          padding: EdgeInsets.only(left: 15, right: 15),
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,childAspectRatio: 0.7),
+          padding: EdgeInsets.only(left: 12, right: 12),
           itemBuilder: (context, index) => searchResults()[index],
           itemCount: searchResults().length,
         ),
@@ -154,8 +152,8 @@ class MaterialSearch extends SearchDelegate {
   Widget _buildSuggestions(BuildContext context) {
     return GridView.builder(
       gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-      padding: EdgeInsets.only(left: 15, right: 15),
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,childAspectRatio: 0.7),
+      padding: EdgeInsets.only(left: 12, right: 12),
       itemBuilder: (context, index) => searchResults()[index],
       itemCount: searchResults().length,
     );
